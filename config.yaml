@@ -1,4 +1,4 @@
-host: 'https://foo.example.net:8094/query'
+url: 'https://foo.example.net:8094/query'
 user: 'admin'
 password: '?'
 db: 'influxdb'

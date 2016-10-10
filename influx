@@ -33,7 +33,7 @@ def main():
     query = ' '.join(args.query)
     print query
     req = requests.get(
-        cfg['host'],
+        cfg['url'],
         auth=(cfg['user'], cfg['password']),
         params={
             'db': cfg['db'],
