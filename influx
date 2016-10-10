@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-import pprint
+import itertools
 import yaml
 import requests
 
@@ -13,11 +13,6 @@ def main():
     )
     parser.add_argument('config', help="config file")
     parser.add_argument('query', nargs='+', help="InfluxDB query")
-    parser.add_argument(
-        '-v', '--verbose',
-        help="print whole result data structure regardless",
-        action='store_true',
-    )
     parser.add_argument(
         '-a', '--nolimit',
         help="print all results",
@@ -38,20 +33,21 @@ def main():
         params={
             'db': cfg['db'],
             'q': query,
+            'pretty': 'true',
         },
     )
 
-    res = req.json()
-    if not args.verbose and \
-        res.keys() == ['results'] and \
-        len(res['results']) == 1 and \
-        res['results'][0].viewkeys() == set(('series',)):
-
-        results = res['results'][0]['series']
-        for line in pprint.pformat(results).splitlines()[:limit]:
-            print line
+    if args.nolimit:
+        print req.text
     else:
-        pprint.pprint(res)
+        i = 0
+        text = ''
+        for line in req:
+            text += line
+            i += line.count('\n')
+            if i > limit:
+                break
+        print text
 
 if __name__ == '__main__':
     sys.exit(main())
