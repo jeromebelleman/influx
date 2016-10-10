@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+import time
 import itertools
 import yaml
 import requests
@@ -27,27 +28,33 @@ def main():
 
     query = ' '.join(args.query)
     print query
-    req = requests.get(
-        cfg['url'],
-        auth=(cfg['user'], cfg['password']),
-        params={
-            'db': cfg['db'],
-            'q': query,
-            'pretty': 'true',
-        },
-    )
+    try:
+        start = time.time()
+        req = requests.get(
+            cfg['url'],
+            auth=(cfg['user'], cfg['password']),
+            params={
+                'db': cfg['db'],
+                'q': query,
+                'pretty': 'true',
+            },
+        )
 
-    if args.nolimit:
-        print req.text
-    else:
-        i = 0
-        text = ''
-        for line in req:
-            text += line
-            i += line.count('\n')
-            if i > limit:
-                break
-        print text
+        if args.nolimit:
+            print req.text
+        else:
+            i = 0
+            text = ''
+            for line in req:
+                text += line
+                i += line.count('\n')
+                if i > limit:
+                    break
+            print text
+
+        print "Queried in %fs" % (time.time() - start)
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == '__main__':
     sys.exit(main())
