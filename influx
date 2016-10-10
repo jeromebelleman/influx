@@ -7,9 +7,12 @@ import yaml
 import requests
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        epilog='''Start queries with SELECT, DELETE, SHOW, CREATE, DROP, GRANT,
+            REVOKE, ALTER, SET, KILL''',
+    )
     parser.add_argument('config', help="config file")
-    parser.add_argument('query', help="InfluxDB query")
+    parser.add_argument('query', nargs='+', help="InfluxDB query")
     parser.add_argument(
         '-v', '--verbose',
         help="print whole result data structure regardless",
@@ -25,7 +28,7 @@ def main():
         auth=(cfg['user'], cfg['password']),
         params={
             'db': cfg['db'],
-            'q': args.query,
+            'q': ' '.join(args.query),
         },
     )
 
