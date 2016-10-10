@@ -1,0 +1,47 @@
+#! /usr/bin/env python
+
+import sys
+import argparse
+import pprint
+import yaml
+import requests
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', help="config file")
+    parser.add_argument('query', help="InfluxDB query")
+    parser.add_argument(
+        '-v', '--verbose',
+        help="print whole result data structure regardless",
+        action='store_true',
+    )
+    args = parser.parse_args()
+
+    with open(args.config) as fhl:
+        cfg = yaml.load(fhl)
+
+    req = requests.get(
+        cfg['host'],
+        auth=(cfg['user'], cfg['password']),
+        params={
+            'db': cfg['db'],
+            'q': args.query,
+        },
+    )
+
+    res = req.json()
+    if not args.verbose and \
+        res.keys() == ['results'] and \
+        len(res['results']) == 1 and \
+        res['results'][0].viewkeys() == set(('series',)) and \
+        len(res['results'][0]['series']) == 1 and \
+        res['results'][0]['series'][0].viewkeys() == \
+            set(('columns', 'name', 'values')):
+
+        # If there's only results and series
+        pprint.pprint(res['results'][0]['series'][0]['values'])
+    else:
+        pprint.pprint(res)
+
+if __name__ == '__main__':
+    sys.exit(main())
