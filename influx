@@ -30,12 +30,14 @@ def main():
 
     limit = None if args.nolimit else cfg['limit']
 
+    query = ' '.join(args.query)
+    print query
     req = requests.get(
         cfg['host'],
         auth=(cfg['user'], cfg['password']),
         params={
             'db': cfg['db'],
-            'q': ' '.join(args.query),
+            'q': query,
         },
     )
 
@@ -48,7 +50,6 @@ def main():
         res['results'][0]['series'][0].viewkeys() == \
             set(('columns', 'name', 'values')):
 
-        # If there's only results and series
         pprint.pprint(res['results'][0]['series'][0]['values'][:limit])
     else:
         pprint.pprint(res)
