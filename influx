@@ -45,12 +45,11 @@ def main():
     if not args.verbose and \
         res.keys() == ['results'] and \
         len(res['results']) == 1 and \
-        res['results'][0].viewkeys() == set(('series',)) and \
-        len(res['results'][0]['series']) == 1 and \
-        res['results'][0]['series'][0].viewkeys() == \
-            set(('columns', 'name', 'values')):
+        res['results'][0].viewkeys() == set(('series',)):
 
-        pprint.pprint(res['results'][0]['series'][0]['values'][:limit])
+        results = res['results'][0]['series']
+        for line in pprint.pformat(results).splitlines()[:limit]:
+            print line
     else:
         pprint.pprint(res)
 
