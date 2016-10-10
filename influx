@@ -18,10 +18,17 @@ def main():
         help="print whole result data structure regardless",
         action='store_true',
     )
+    parser.add_argument(
+        '-a', '--nolimit',
+        help="print all results",
+        action='store_true',
+    )
     args = parser.parse_args()
 
     with open(args.config) as fhl:
         cfg = yaml.load(fhl)
+
+    limit = None if args.nolimit else cfg['limit']
 
     req = requests.get(
         cfg['host'],
@@ -42,7 +49,7 @@ def main():
             set(('columns', 'name', 'values')):
 
         # If there's only results and series
-        pprint.pprint(res['results'][0]['series'][0]['values'])
+        pprint.pprint(res['results'][0]['series'][0]['values'][:limit])
     else:
         pprint.pprint(res)
 
